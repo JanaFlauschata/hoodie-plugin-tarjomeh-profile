@@ -1,0 +1,6 @@
+{
+  "name": "hoodie-plugin-tarjomeh-profile",
+  "description": "Manages user profiles in a public read-only database",
+  "version": "1.0.0",
+  "main": "worker.js"
+}

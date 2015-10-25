@@ -18,13 +18,10 @@ module.exports = function (hoodie, done) {
         }
     });
 
-    var store = hoodie.open('hoodie-plugin-tarjomeh-profile');
-    store.connect();
-
     hoodie.task.on('findoraddprofile:add', findOrAddProfile);
 
     function findOrAddProfile(originDb, profile) {
-        var hoodieId = originDb.replace('user/', '');
+        var hoodieId = profile.id;
 
         // workaround to ensure the task will be found when calling success
         var id = profile.id;
@@ -32,8 +29,11 @@ module.exports = function (hoodie, done) {
 
         var database = hoodie.database(exports.dbName);
 
-        database.find('profile', hoodieId, function (error, profile) {
+        database.find('profile', hoodieId, function (error, foundProfile) {
             if (error) {
+		// workaround to prevent document update conflicts
+		delete profile._id;
+		delete profile._rev;
                 database.add('profile', profile, function (error, profile) {
                     if (error) {
                         return hoodie.task.error(originDb, profile, error);
@@ -43,16 +43,17 @@ module.exports = function (hoodie, done) {
                     profile.id = id;
                     profile.type = type;
 
-                    return hoodie.task.success(originDb, message);
+                    return hoodie.task.success(originDb, profile);
                 });
             }
             else {
                 // resetting id and type to identify the original task
-                //TODO necessary?
-                profile.id = id;
-                profile.type = type;
-
-                return hoodie.task.success(originDb, profile);
+                foundProfile.id = id;
+                foundProfile.type = type;
+		// workaround to prevent document update conflicts
+		delete foundProfile._id;
+		delete foundProfile._rev;
+                return hoodie.task.success(originDb, foundProfile);
             }
         });
     }

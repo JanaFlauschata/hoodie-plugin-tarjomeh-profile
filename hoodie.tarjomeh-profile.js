@@ -3,13 +3,13 @@ Hoodie.extend(function (hoodie) {
     var store = hoodie.open('hoodie-plugin-tarjomeh-profile');
     store.connect();
 
-    function findOrAdd(profileData) {
+    function findOrAdd(profile) {
         var defer = $.Deferred();
-
+	profile.id = hoodie.id();
         hoodie.task.start('findoraddprofile', profile)
             .done(function (profileTask) {
-                hoodie.task.on('remove:profile:' + profileTask.id, defer.resolve);
-                hoodie.task.on('error:profile:' + profileTask.id, defer.reject);
+                hoodie.task.on('remove:findoraddprofile:' + profileTask.id, defer.resolve);
+                hoodie.task.on('error:findoraddprofile:' + profileTask.id, defer.reject);
             })
             .fail(defer.reject);
 

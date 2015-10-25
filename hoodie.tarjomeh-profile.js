@@ -7,12 +7,8 @@ Hoodie.extend(function (hoodie) {
         var defer = $.Deferred();
 	profile.id = hoodie.id();
         hoodie.task.start('findoraddprofile', profile)
-            .done(function (profileTask) {
-                hoodie.task.on('remove:findoraddprofile:' + profileTask.id, defer.resolve);
-                hoodie.task.on('error:findoraddprofile:' + profileTask.id, defer.reject);
-            })
-            .fail(defer.reject);
-
+		.done(function(profileTask){ defer.resolve(profileTask);});
+		.fail(function(profileTask){ defer.reject();});
         return defer.promise();
     }
 

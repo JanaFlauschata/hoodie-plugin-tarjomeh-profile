@@ -8,7 +8,17 @@ Hoodie.extend(function (hoodie) {
 	profile.id = hoodie.id();
         hoodie.task.start('findoraddprofile', {profile: profile})
 		.done(function(profileTask){ defer.resolve(profileTask.profile);})
-		.fail(function(profileTask){ defer.reject();});
+		.fail(function(error){ defer.reject(error);});
+        return defer.promise();
+    }
+
+    function find(id) {
+        var defer = $.Deferred();
+
+	store.find('profile', id)
+    		.done(function(profile) { defer.resolve(profile); })
+    		.fail(function(error) { defer.reject(error); });
+
         return defer.promise();
     }
 
@@ -17,14 +27,16 @@ Hoodie.extend(function (hoodie) {
     function findAll() {
         var defer = $.Deferred();
         store.findAll('profile')
-            .done(defer.resolve)
-            .fail(defer.reject)
+            .done(function(allProfiles) {
+   		 defer.resolve(allProfiles);
+    	     })
+            .fail(function(error) { defer.reject(error); })
 
         return defer.promise();
     }
 
     function on(eventName, callback) {
-        hoodie.task.on(eventName + ':profile', callback);
+        store.on('profile:' + eventName, callback);
     }
 
     hoodie.profile = {

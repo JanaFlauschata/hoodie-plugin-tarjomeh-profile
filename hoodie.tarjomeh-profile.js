@@ -6,8 +6,8 @@ Hoodie.extend(function (hoodie) {
     function findOrAdd(profile) {
         var defer = $.Deferred();
 	profile.id = hoodie.id();
-        hoodie.task.start('findoraddprofile', profile)
-		.done(function(profileTask){ defer.resolve(profileTask);});
+        hoodie.task.start('findoraddprofile', {profile: profile})
+		.done(function(profileTask){ defer.resolve(profileTask.profile);})
 		.fail(function(profileTask){ defer.reject();});
         return defer.promise();
     }
